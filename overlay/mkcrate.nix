@@ -79,7 +79,8 @@ let
         else "--features ${concatStringsSep "," featuresWithoutDefault}";
     in
       ''
-        cargo build $CARGO_VERBOSE ${optionalString release "--release"} --target ${host-triple} ${buildMode} \
+        cargo build $CARGO_VERBOSE ${optionalString release "--release"} \
+          --target bpfel-unknown-unknown ${buildMode} \
           ${featuresArg} ${optionalString (!hasDefaultFeature) "--no-default-features"} \
           --message-format=json | tee .cargo-build-output
       '';
@@ -141,7 +142,8 @@ let
       [target."${realHostTriple stdenv.buildPlatform}"]
       linker = "${ccForBuild}"
     '' + optionalString (stdenv.buildPlatform != stdenv.hostPlatform && !(stdenv.hostPlatform.isWasi or false)) ''
-      [target."${host-triple}"]
+      # [target."${host-triple}"]
+      [target.bpfel-unknown-unknown]
       linker = "${ccForHost}"
     '' + ''
       EOF
